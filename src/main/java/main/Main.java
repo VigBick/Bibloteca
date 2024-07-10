@@ -20,8 +20,8 @@ public class Main {
         while (loopMenuInicial) {
             mostrarMenu();
 			int opcion = scanner.nextInt();
-            scanner.nextLine();
-            switch (opcion) {
+            scanner.nextLine(); //consumir salto de linea
+            switch (opcion) {	//Menu inicial
                 case 1:
                 	MenuLibros();
                     break;
@@ -62,7 +62,7 @@ public class Main {
 	        
 	        int opcion2 = scanner.nextInt();
 	        scanner.nextLine(); // Consumir el salto de línea
-	        switch (opcion2) {
+	        switch (opcion2) {	//Menu dedicado para movimientos de libros
             case 1:
             	nuevoLibro();
                 break;
@@ -97,7 +97,7 @@ public class Main {
 			System.out.print("Seleccione una opción: ");
 			int opcion2 = scanner.nextInt();
             scanner.nextLine(); // Consumir el salto de línea
-            switch (opcion2) {
+            switch (opcion2) {	// Menu dedicado para movimientos de miembros
             case 1:
             	nuevoMiembro();
                 break;
@@ -132,7 +132,7 @@ public class Main {
 			System.out.print("Seleccione una opción: ");
 			int opcion2 = scanner.nextInt();
 			scanner.nextLine(); // Consumir el salto de línea
-			switch (opcion2) {
+			switch (opcion2) {	// Menu dedicado para movimientos de prestamos
 			case 1:
 				registrarPrestamo();
 				break;
@@ -161,15 +161,21 @@ public class Main {
         String autor = scanner.nextLine();
         System.out.println("ISBN: ");
         int isbn = scanner.nextInt();
-        scanner.nextLine();
-        Libro libro = new Libro(titulo, autor, isbn);
-		libroDAO.insertLibro(libro);
+        scanner.nextLine();	//consumir salto de linea
+        try {	//validamos la entrada
+        	Libro libro = new Libro(titulo, autor, isbn);	//guardamos un nuevo libro con la info
+        	libroDAO.insertLibro(libro);	// insertamos el libro
+        	System.out.println("Libro creado correctamente: " + libro.getTitulo());
+        }catch(IllegalArgumentException e){
+        	System.out.println("Error: " + e.getMessage());
+        }
+        
     }
 	
 	private static void actualizarLibro() {
         System.out.println("Ingrese el ID del Libro a actualizar: ");
         int id = scanner.nextInt();
-        scanner.nextLine();
+        scanner.nextLine();	//Consumir salto de linea
         System.out.println("Nuevo titulo: ");
         String titulo = scanner.nextLine();
         System.out.println("Nueva autor: ");
@@ -177,30 +183,30 @@ public class Main {
         System.out.println("Nuevo isbn: ");
         int isbn = scanner.nextInt();
         scanner.nextLine();
-        System.out.println("Intrudusca existencia: ");
-        int existencia = scanner.nextInt();
-        scanner.nextLine();
+        System.out.println("Intrudusca existencia: ");	// Solo aqui podemos modificar
+        int existencia = scanner.nextInt();				// Existencias
+        scanner.nextLine();	//Consumir salto de linea
         libroDAO.actualizarLibro(id, titulo, autor, isbn, existencia);
     }
 	
 	private static void eliminarLibro() {
         System.out.println("Ingrese el ID del Libro a eliminar: ");
         int id = scanner.nextInt();
-        scanner.nextLine();
+        scanner.nextLine();	//consumir salto de linea
         LibroDAO.eliminarLibro(id);
     }
 	
 	private static void buscarLibro() {
-        System.out.println("Buscar libro por:");
-        System.out.println("1) Título");
+        System.out.println("Buscar libro por:");	//Es posible buscar el libro
+        System.out.println("1) Título");			//Mediante varios parametros
         System.out.println("2) Autor");
         System.out.println("3) ISBN");
 
         int choice = scanner.nextInt();
         scanner.nextLine(); 
 
-        String criterio = "";
-        String valor = "";
+        String criterio = "";		//Mandaremos estas variables como
+        String valor = "";			//parametros
 
         switch (choice) {
             case 1:
@@ -222,15 +228,19 @@ public class Main {
                 System.out.println("Opción no válida, intente de nuevo.");
                 return;
         }
-
         libroDAO.buscarLibro(criterio, valor);
     }
 	
 	private static void nuevoMiembro() {
-        System.out.println("nombre: ");
-        String nombre = scanner.nextLine();
-        Miembro miembro = new Miembro(nombre);
-		MiembroDAO.insertMiembro(miembro);
+        System.out.println("nombre: ");			//Los miembros tambien tienen ID
+        String nombre = scanner.nextLine();		//pero esto es assignado por
+        try {									//auto increment in SQL
+        	Miembro miembro = new Miembro(nombre);	
+    		MiembroDAO.insertMiembro(miembro);
+        }catch(IllegalArgumentException e) {	//Validando la entrada 
+        	System.out.println("Error: " + e.getMessage());
+        }
+        
     }
 	
 	private static void actualizarMiembro() {
@@ -254,15 +264,15 @@ public class Main {
 		String valor = "";
 		System.out.println("Ingrese el nombre del miembro:");
         valor = scanner.nextLine();
-		MiembroDAO.buscarMiembro(valor);
+		MiembroDAO.buscarMiembro(valor);	//enviamos parametro para hacer busqueda
 	}
 	
 	public static void registrarPrestamo() {
         System.out.print("Ingrese el ID del libro: ");
         int libroID = scanner.nextInt();
         System.out.print("Ingrese el ID del miembro: ");
-        int miembroID = scanner.nextInt();
-
+        int miembroID = scanner.nextInt();		//Se registra mediante el Id de
+        										//el libro y el miembro
         try {
             prestamoDAO.registrarPrestamo(libroID, miembroID);
             System.out.println("Préstamo registrado exitosamente.");
@@ -298,13 +308,15 @@ public class Main {
     }
 	
 	public static void disponibilidadLibros() {
+		System.out.print("Ingrese el ID del libro: ");
+        int libroID = scanner.nextInt();
         try {
-            List<String> disponibilidad = prestamoDAO.disponibilidadLibros();
-            for (String registro : disponibilidad) {
+            List<String> historial = prestamoDAO.historialLibro(libroID);
+            for (String registro : historial) {
                 System.out.println(registro);
             }
         } catch (SQLException e) {
-            System.out.println("Error al obtener la disponibilidad de los libros: " + e.getMessage());
+            System.out.println("Error al obtener el historial del libro: " + e.getMessage());
         }
     }
 }

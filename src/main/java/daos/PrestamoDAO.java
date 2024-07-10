@@ -13,30 +13,50 @@ import db.DatabaseConnection;
 
 public class PrestamoDAO {
 	public void registrarPrestamo(int libroID, int miembroID) throws SQLException {
-        String sqlPrestamo = "INSERT INTO TBL_PRESTAMOS(fechaINI, libroID, miembroID) VALUES (?, ?, ?)";
-        String sqlIncrementarLibrosPrestados = "UPDATE TBL_LIBROS SET librosPrestados = librosPrestados + 1 WHERE id = ?";
+	    String sqlPrestamo = "INSERT INTO TBL_PRESTAMOS(fechaINI, libroID, miembroID) VALUES (?, ?, ?)";
+	    String sqlIncrementarLibrosPrestados = "UPDATE TBL_LIBROS SET prestados = prestados + 1 WHERE id = ?";
+	    String sqlVerificarLibro = "SELECT COUNT(*) FROM TBL_LIBROS WHERE id = ?";
+	    String sqlVerificarMiembro = "SELECT COUNT(*) FROM TBL_MIEMBROS WHERE id = ?";
 
-        try (Connection connection = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement statementPrestamo = connection.prepareStatement(sqlPrestamo);
-             PreparedStatement statementIncrementarLibrosPrestados = connection.prepareStatement(sqlIncrementarLibrosPrestados)) {
+	    try (Connection connection = DatabaseConnection.getInstance().getConnection();
+	         PreparedStatement statementVerificarLibro = connection.prepareStatement(sqlVerificarLibro);
+	         PreparedStatement statementVerificarMiembro = connection.prepareStatement(sqlVerificarMiembro);
+	         PreparedStatement statementPrestamo = connection.prepareStatement(sqlPrestamo);
+	         PreparedStatement statementIncrementarLibrosPrestados = connection.prepareStatement(sqlIncrementarLibrosPrestados)) {
 
-            connection.setAutoCommit(false);
-            Date fechaActual = new Date(System.currentTimeMillis());
+	        connection.setAutoCommit(false);
 
-            statementPrestamo.setDate(1, fechaActual);
-            statementPrestamo.setInt(2, libroID);
-            statementPrestamo.setInt(3, miembroID);
-            statementPrestamo.executeUpdate();
+	        // Verificar existencia del libro
+	        statementVerificarLibro.setInt(1, libroID);
+	        ResultSet rsLibro = statementVerificarLibro.executeQuery();
+	        if (rsLibro.next() && rsLibro.getInt(1) == 0) {
+	            throw new SQLException("Libro ID no encontrado: " + libroID);
+	        }
 
-            statementIncrementarLibrosPrestados.setInt(1, libroID);
-            statementIncrementarLibrosPrestados.executeUpdate();
+	        // Verificar existencia del miembro
+	        statementVerificarMiembro.setInt(1, miembroID);
+	        ResultSet rsMiembro = statementVerificarMiembro.executeQuery();
+	        if (rsMiembro.next() && rsMiembro.getInt(1) == 0) {
+	            throw new SQLException("Miembro ID no encontrado: " + miembroID);
+	        }
 
-            connection.commit();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
-        }
-    }
+	        // Registrar el préstamo
+	        Date fechaActual = new Date(System.currentTimeMillis());
+	        statementPrestamo.setDate(1, fechaActual);
+	        statementPrestamo.setInt(2, libroID);
+	        statementPrestamo.setInt(3, miembroID);
+	        statementPrestamo.executeUpdate();
+
+	        // Incrementar libros prestados
+	        statementIncrementarLibrosPrestados.setInt(1, libroID);
+	        statementIncrementarLibrosPrestados.executeUpdate();
+
+	        connection.commit();
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        throw e;
+	    }
+	}
 
 	public void registrarDevolucion(int prestamoID) throws SQLException {
         String sqlDevolucion = "UPDATE TBL_PRESTAMOS SET fechaFIN = ? WHERE id = ?";
@@ -88,26 +108,37 @@ public class PrestamoDAO {
         return historial;
     }
 
-    public List<String> disponibilidadLibros() throws SQLException {
-        List<String> disponibilidad = new ArrayList<>();
-        String sql = "SELECT titulo, existencias, librosPrestados, (existencias - librosPrestados) as disponibles FROM TBL_LIBROS";
+    public List<String> historialLibro(int libroID) throws SQLException {
+        List<String> historial = new ArrayList<>();
+        String sql = "SELECT l.titulo, l.autor, l.isbn, p.fechaINI, p.fechaFIN, m.nombre " +
+                     "FROM TBL_LIBROS l " +
+                     "JOIN TBL_PRESTAMOS p ON l.id = p.libroID " +
+                     "JOIN TBL_MIEMBROS m ON p.miembroID = m.id " +
+                     "WHERE l.id = ?";
 
         try (Connection connection = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql);
-             ResultSet resultSet = statement.executeQuery()) {
+             PreparedStatement statement = connection.prepareStatement(sql)) {
 
-            while (resultSet.next()) {
-                String titulo = resultSet.getString("titulo");
-                int existencias = resultSet.getInt("existencias");
-                int librosPrestados = resultSet.getInt("librosPrestados");
-                int disponibles = resultSet.getInt("disponibles");
-                disponibilidad.add("Libro: " + titulo + ", Existencias: " + existencias + ", Prestados: " + librosPrestados + ", Disponibles: " + disponibles);
+            statement.setInt(1, libroID);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    String titulo = resultSet.getString("titulo");
+                    String autor = resultSet.getString("autor");
+                    int isbn = resultSet.getInt("isbn");
+                    String fechaINI = resultSet.getDate("fechaINI").toString();
+                    String fechaFIN = resultSet.getDate("fechaFIN") != null ? resultSet.getDate("fechaFIN").toString() : "No devuelto";
+                    String nombreMiembro = resultSet.getString("nombre");
+
+                    historial.add("Título: " + titulo + ", Autor: " + autor + ", ISBN: " + isbn +
+                                  ", Fecha de Préstamo: " + fechaINI + ", Fecha de Devolución: " + fechaFIN +
+                                  ", Miembro: " + nombreMiembro);
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
             throw e;
         }
 
-        return disponibilidad;
+        return historial;
     }
 }

@@ -11,7 +11,7 @@ import db.DatabaseConnection;
 
 public class LibroDAO {
 	public void insertLibro(Libro libro) {
-		String sql = "INSERT INTO TBL_LIBROS(titulo, autor, isbn, existencia) VALUES (?, ?, ?);";
+		String sql = "INSERT INTO TBL_LIBROS(titulo, autor, isbn, existencia) VALUES (?, ?, ?, ?);";
 		
 		try(Connection connection = DatabaseConnection.getInstance().getConnection();
 				PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -87,13 +87,18 @@ public class LibroDAO {
             
             ResultSet resultSet = statement.executeQuery();
             
+            boolean contenido = false;
             while (resultSet.next()) {
+            	contenido = true;
                 System.out.println("ID: " + resultSet.getInt("id"));
                 System.out.println("Título: " + resultSet.getString("titulo"));
                 System.out.println("Autor: " + resultSet.getString("autor"));
                 System.out.println("ISBN: " + resultSet.getInt("isbn"));
                 System.out.println("---------------------");
             }
+            if (contenido == false) {
+				System.out.println("Libro no encontrado");
+			}
             
         } catch (SQLException exception) {
             exception.printStackTrace();

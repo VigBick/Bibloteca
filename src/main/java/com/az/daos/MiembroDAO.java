@@ -1,4 +1,4 @@
-package daos;
+package com.az.daos;
 
 
 import java.sql.Connection;
@@ -7,8 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
-import clases.Miembro;
-import db.DatabaseConnection;
+import com.az.clases.Miembro;
+import com.az.db.DatabaseConnection;
 
 
 public class MiembroDAO {

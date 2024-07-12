@@ -1,4 +1,4 @@
-package daos;
+package com.az.daos;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -8,7 +8,7 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
-import db.DatabaseConnection;
+import com.az.db.DatabaseConnection;
 
 
 public class PrestamoDAO {
@@ -60,7 +60,7 @@ public class PrestamoDAO {
 
 	public void registrarDevolucion(int prestamoID) throws SQLException {
         String sqlDevolucion = "UPDATE TBL_PRESTAMOS SET fechaFIN = ? WHERE id = ?";
-        String sqlDecrementarLibrosPrestados = "UPDATE TBL_LIBROS SET librosPrestados = librosPrestados - 1 WHERE id = (SELECT libroID FROM TBL_PRESTAMOS WHERE id = ?)";
+        String sqlDecrementarLibrosPrestados = "UPDATE TBL_LIBROS SET Prestados = Prestados - 1 WHERE id = (SELECT libroID FROM TBL_PRESTAMOS WHERE id = ?)";
 
         try (Connection connection = DatabaseConnection.getInstance().getConnection();
              PreparedStatement statementDevolucion = connection.prepareStatement(sqlDevolucion);
@@ -83,30 +83,37 @@ public class PrestamoDAO {
         }
     }
 
-    public List<String> historialMiembros(int miembroID) throws SQLException {
-        List<String> historial = new ArrayList<>();
-        String sql = "SELECT p.id, l.titulo, p.fechaINI, p.fechaFIN FROM TBL_PRESTAMOS p JOIN TBL_LIBROS l ON p.libroID = l.id WHERE p.miembroID = ?";
+	public List<String> historialMiembros(int miembroID) throws SQLException {
+	    List<String> historial = new ArrayList<>();
+	    String sql = "SELECT p.id, l.titulo, p.fechaINI, p.fechaFIN FROM TBL_PRESTAMOS p JOIN TBL_LIBROS l ON p.libroID = l.id WHERE p.miembroID = ?";
 
-        try (Connection connection = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+	    try (Connection connection = DatabaseConnection.getInstance().getConnection();
+	         PreparedStatement statement = connection.prepareStatement(sql)) {
 
-            statement.setInt(1, miembroID);
-            ResultSet resultSet = statement.executeQuery();
+	        statement.setInt(1, miembroID);
+	        ResultSet resultSet = statement.executeQuery();
 
-            while (resultSet.next()) {
-                int prestamoID = resultSet.getInt("id");
-                String titulo = resultSet.getString("titulo");
-                Date fechaINI = resultSet.getDate("fechaINI");
-                Date fechaFIN = resultSet.getDate("fechaFIN");
-                historial.add("Prestamo ID: " + prestamoID + ", Libro: " + titulo + ", Fecha Inicio: " + fechaINI + ", Fecha Fin: " + (fechaFIN != null ? fechaFIN : "No devuelto"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
-        }
+	        // Verificar si hay resultados antes de procesar el ResultSet
+	        if (!resultSet.next()) {
+	            // No se encontraron préstamos para el miembro especificado
+	            historial.add("No se encontraron préstamos para el miembro con ID: " + miembroID);
+	        } else {
+	            // Procesar los resultados del ResultSet
+	            do {
+	                int prestamoID = resultSet.getInt("id");
+	                String titulo = resultSet.getString("titulo");
+	                Date fechaINI = resultSet.getDate("fechaINI");
+	                Date fechaFIN = resultSet.getDate("fechaFIN");
+	                historial.add("Prestamo ID: " + prestamoID + ", Libro: " + titulo + ", Fecha Inicio: " + fechaINI + ", Fecha Fin: " + (fechaFIN != null ? fechaFIN : "No devuelto"));
+	            } while (resultSet.next());
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        throw e;
+	    }
 
-        return historial;
-    }
+	    return historial;
+	}
 
     public List<String> historialLibro(int libroID) throws SQLException {
         List<String> historial = new ArrayList<>();

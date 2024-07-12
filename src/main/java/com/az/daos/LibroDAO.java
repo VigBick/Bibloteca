@@ -1,12 +1,12 @@
-package daos;
+package com.az.daos;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import clases.Libro;
-import db.DatabaseConnection;
+import com.az.clases.Libro;
+import com.az.db.DatabaseConnection;
 
 
 public class LibroDAO {

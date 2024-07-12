@@ -3,9 +3,10 @@ import static org.junit.Assert.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import clases.Miembro;
-import daos.MiembroDAO;
-import db.DatabaseConnection;
+
+import com.az.clases.Miembro;
+import com.az.daos.MiembroDAO;
+import com.az.db.DatabaseConnection;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

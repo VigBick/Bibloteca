@@ -9,9 +9,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import clases.Libro;
-import daos.LibroDAO;
-import db.DatabaseConnection;
+import com.az.clases.Libro;
+import com.az.daos.LibroDAO;
+import com.az.db.DatabaseConnection;
 
 class LibroDAOTest {
 	private LibroDAO libroDAO;

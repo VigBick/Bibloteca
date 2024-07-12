@@ -3,8 +3,9 @@ import static org.junit.Assert.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import daos.PrestamoDAO;
-import db.DatabaseConnection;
+
+import com.az.daos.PrestamoDAO;
+import com.az.db.DatabaseConnection;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

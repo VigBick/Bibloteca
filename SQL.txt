@@ -1,0 +1,29 @@
+CREATE DATABASE DB_biblioteca;
+USE DB_Biblioteca;
+
+CREATE TABLE TBL_LIBROS(
+id INT auto_increment PRIMARY KEY,
+titulo VARCHAR(50) NOT NULL,
+autor VARCHAR(50) NOT NULL,
+isbn int not null,
+existencia int,
+prestados int
+);
+
+CREATE TABLE TBL_MIEMBROS(
+id int auto_increment PRIMARY KEY,
+nombre VARCHAR(50) NOT NULL,
+fecha DATE not NULL
+);
+
+CREATE TABLE TBL_PRESTAMOS(
+id int auto_increment PRIMARY KEY,
+fechaINI DATE not NULL,
+fechaFIN DATE,
+libroID int not NULL,
+foreign key(libroID) REFERENCES TBL_LIBROS(id),
+miembroID int NOT NULL,
+foreign key(miembroID) REFERENCES TBL_MIEMBROS(id)
+);
+
+SET SQL_SAFE_UPDATES = 0;

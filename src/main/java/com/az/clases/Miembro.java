@@ -1,4 +1,4 @@
-package clases;
+package com.az.clases;
 
 public class Miembro {
 	String nombre;
@@ -16,6 +16,14 @@ public class Miembro {
         }
         if (nombre.length() < 2) {//Validando que el nombre tenga almenos 2 caracteres
             throw new IllegalArgumentException("El Nombre es demaciado corto.");
+        }
+        // Verifica que los espacios solo se permitan si hay más de una palabra
+        if (nombre.trim().contains("  ") || nombre.startsWith(" ") || nombre.endsWith(" ")) {
+            throw new IllegalArgumentException("El título no puede tener múltiples espacios consecutivos, ni comenzar ni terminar con espacios.");
+        }
+        // Verifica que solo se pueda intruducir caracteres alfabeticos y espacios
+        if (!nombre.matches("[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ ]+")) {
+            throw new IllegalArgumentException("El nombre solo puede contener caracteres alfabéticos y espacios.");
         }
         this.nombre = nombre;
     }

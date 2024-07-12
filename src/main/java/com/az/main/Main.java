@@ -1,14 +1,14 @@
-package main;
+package com.az.main;
 
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Scanner;
 
-import clases.Libro;
-import clases.Miembro;
-import daos.LibroDAO;
-import daos.MiembroDAO;
-import daos.PrestamoDAO;
+import com.az.clases.Libro;
+import com.az.clases.Miembro;
+import com.az.daos.LibroDAO;
+import com.az.daos.MiembroDAO;
+import com.az.daos.PrestamoDAO;
 
 public class Main {
 	private static Scanner scanner = new Scanner(System.in);
@@ -45,6 +45,7 @@ public class Main {
         System.out.println("1) Libros");
         System.out.println("2) Miembros");
         System.out.println("3) Prestamos");
+        System.out.println("4) Salir");
         System.out.print("Seleccione una opción: ");
     }
 	private static void MenuLibros() {
@@ -160,34 +161,47 @@ public class Main {
         System.out.println("autor: ");
         String autor = scanner.nextLine();
         System.out.println("ISBN: ");
-        int isbn = scanner.nextInt();
+        String isbn = scanner.nextLine();
         scanner.nextLine();	//consumir salto de linea
         try {	//validamos la entrada
-        	Libro libro = new Libro(titulo, autor, isbn);	//guardamos un nuevo libro con la info
+        	Libro libro = new Libro(titulo, autor, Integer.parseInt(isbn));	//guardamos un nuevo libro con la info
         	libroDAO.insertLibro(libro);	// insertamos el libro
         	System.out.println("Libro creado correctamente: " + libro.getTitulo());
+        }catch (NumberFormatException e) {
+            System.out.println("Entrada no válida. Por favor, ingrese un número entero.");
         }catch(IllegalArgumentException e){
+        	
         	System.out.println("Error: " + e.getMessage());
         }
-        
     }
 	
 	private static void actualizarLibro() {
-        System.out.println("Ingrese el ID del Libro a actualizar: ");
-        int id = scanner.nextInt();
-        scanner.nextLine();	//Consumir salto de linea
-        System.out.println("Nuevo titulo: ");
-        String titulo = scanner.nextLine();
-        System.out.println("Nueva autor: ");
-        String autor = scanner.nextLine();
-        System.out.println("Nuevo isbn: ");
-        int isbn = scanner.nextInt();
-        scanner.nextLine();
-        System.out.println("Intrudusca existencia: ");	// Solo aqui podemos modificar
-        int existencia = scanner.nextInt();				// Existencias
-        scanner.nextLine();	//Consumir salto de linea
-        libroDAO.actualizarLibro(id, titulo, autor, isbn, existencia);
-    }
+	    System.out.println("Ingrese el ID del Libro a actualizar: ");
+	    int id = scanner.nextInt();
+	    scanner.nextLine();    // Consumir salto de línea
+	    System.out.println("Nuevo título: ");
+	    String titulo = scanner.nextLine();
+	    System.out.println("Nuevo autor: ");
+	    String autor = scanner.nextLine();
+	    System.out.println("Nuevo ISBN: ");
+	    int isbn = scanner.nextInt();
+	    scanner.nextLine();
+	    
+	    int existencia;
+	    do {
+	        System.out.println("Ingrese la nueva existencia (debe ser mayor que 0): ");
+	        existencia = scanner.nextInt();
+	        scanner.nextLine();    // Consumir salto de línea
+	        
+	        if (existencia <= 0) {
+	            System.out.println("La existencia debe ser mayor que 0.");
+	            System.out.println("Si la existencia es de 0, recomendamos elimitar el libro.");
+	            
+	        }
+	    } while (existencia <= 0);
+
+	    libroDAO.actualizarLibro(id, titulo, autor, isbn, existencia);
+	}
 	
 	private static void eliminarLibro() {
         System.out.println("Ingrese el ID del Libro a eliminar: ");

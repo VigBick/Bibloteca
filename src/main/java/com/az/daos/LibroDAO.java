@@ -67,6 +67,7 @@ public class LibroDAO {
             statement.setInt(5, id);
             
             statement.executeUpdate();
+            System.out.println("libro actualizado");
             
         } catch (SQLException exception) {
             exception.printStackTrace();
@@ -74,34 +75,36 @@ public class LibroDAO {
     }
 	
 	public void buscarLibro(String criterio, String valor) {
-        String sql = "SELECT * FROM TBL_LIBROS WHERE " + criterio + " = ?;";
-        
-        try(Connection connection = DatabaseConnection.getInstance().getConnection();
-            PreparedStatement statement = connection.prepareStatement(sql)) {
-            
-            if (criterio.equals("isbn")) {
-                statement.setInt(1, Integer.parseInt(valor));
-            } else {
-                statement.setString(1, valor);
-            }
-            
-            ResultSet resultSet = statement.executeQuery();
-            
-            boolean contenido = false;
-            while (resultSet.next()) {
-            	contenido = true;
-                System.out.println("ID: " + resultSet.getInt("id"));
-                System.out.println("Título: " + resultSet.getString("titulo"));
-                System.out.println("Autor: " + resultSet.getString("autor"));
-                System.out.println("ISBN: " + resultSet.getInt("isbn"));
-                System.out.println("---------------------");
-            }
-            if (contenido == false) {
-				System.out.println("Libro no encontrado");
-			}
-            
-        } catch (SQLException exception) {
-            exception.printStackTrace();
-        }
-    }
+	    // Usamos LIKE para permitir coincidencias parciales
+	    String sql = "SELECT * FROM TBL_LIBROS WHERE " + criterio + " LIKE ?;";
+	    
+	    try (Connection connection = DatabaseConnection.getInstance().getConnection();
+	         PreparedStatement statement = connection.prepareStatement(sql)) {
+	        
+	        if (criterio.equals("isbn")) {
+	            statement.setInt(1, Integer.parseInt(valor));
+	        } else {
+	            // Usamos % para permitir coincidencias parciales
+	            statement.setString(1, "%" + valor + "%");
+	        }
+	        
+	        ResultSet resultSet = statement.executeQuery();
+	        
+	        boolean contenido = false;
+	        while (resultSet.next()) {
+	            contenido = true;
+	            System.out.println("ID: " + resultSet.getInt("id"));
+	            System.out.println("Título: " + resultSet.getString("titulo"));
+	            System.out.println("Autor: " + resultSet.getString("autor"));
+	            System.out.println("ISBN: " + resultSet.getInt("isbn"));
+	            System.out.println("---------------------");
+	        }
+	        if (!contenido) {
+	            System.out.println("Libro no encontrado");
+	        }
+	        
+	    } catch (SQLException exception) {
+	        exception.printStackTrace();
+	    }
+	}
 }

@@ -74,24 +74,31 @@ public class MiembroDAO {
     }
 	
 	public static void buscarMiembro(String valor) {
-        String sql = "SELECT * FROM TBL_MIEMBROS WHERE nombre = ?;";
-        
-        try(Connection connection = DatabaseConnection.getInstance().getConnection();
-            PreparedStatement statement = connection.prepareStatement(sql)) {
-            
-            statement.setString(1, valor);
+	    // Usamos LIKE para permitir coincidencias parciales
+	    String sql = "SELECT * FROM TBL_MIEMBROS WHERE nombre LIKE ?;";
+	    
+	    try (Connection connection = DatabaseConnection.getInstance().getConnection();
+	         PreparedStatement statement = connection.prepareStatement(sql)) {
+	        
+	        // Usamos % para permitir coincidencias parciales
+	        statement.setString(1, "%" + valor + "%");
 
-            ResultSet resultSet = statement.executeQuery();
-            
-            while (resultSet.next()) {
-                System.out.println("ID: " + resultSet.getInt("id"));
-                System.out.println("Nombre: " + resultSet.getString("nombre"));
-                System.out.println("---------------------");
-            }
-            
-        } catch (SQLException exception) {
-            exception.printStackTrace();
-        }
-    }
+	        ResultSet resultSet = statement.executeQuery();
+	        
+	        boolean contenido = false;
+	        while (resultSet.next()) {
+	            contenido = true;
+	            System.out.println("ID: " + resultSet.getInt("id"));
+	            System.out.println("Nombre: " + resultSet.getString("nombre"));
+	            System.out.println("---------------------");
+	        }
+	        if (!contenido) {
+	            System.out.println("Miembro no encontrado");
+	        }
+	        
+	    } catch (SQLException exception) {
+	        exception.printStackTrace();
+	    }
+	}
 }
 

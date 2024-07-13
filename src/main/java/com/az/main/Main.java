@@ -177,7 +177,7 @@ public class Main {
 	
 	private static void actualizarLibro() {
 	    System.out.println("Ingrese el ID del Libro a actualizar: ");
-	    int id = scanner.nextInt();
+	    String id = scanner.nextLine();
 	    scanner.nextLine();    // Consumir salto de línea
 	    System.out.println("Nuevo título: ");
 	    String titulo = scanner.nextLine();
@@ -199,8 +199,16 @@ public class Main {
 	            
 	        }
 	    } while (existencia <= 0);
-
-	    libroDAO.actualizarLibro(id, titulo, autor, isbn, existencia);
+	    
+	    try {
+	    	libroDAO.actualizarLibro(Integer.parseInt(id), titulo, autor, isbn, existencia);
+	    }catch (NumberFormatException e) {
+            System.out.println("Valor invalido, intente otra vez.");
+        }catch(IllegalArgumentException e){
+        	
+        	System.out.println("Error: " + e.getMessage());
+        }
+	    
 	}
 	
 	private static void eliminarLibro() {
@@ -211,39 +219,47 @@ public class Main {
     }
 	
 	private static void buscarLibro() {
-        System.out.println("Buscar libro por:");	//Es posible buscar el libro
-        System.out.println("1) Título");			//Mediante varios parametros
-        System.out.println("2) Autor");
-        System.out.println("3) ISBN");
+	    System.out.println("Buscar libro por:");
+	    System.out.println("1) Título");
+	    System.out.println("2) Autor");
+	    System.out.println("3) ISBN");
 
-        int choice = scanner.nextInt();
-        scanner.nextLine(); 
+	    int choice = scanner.nextInt();
+	    scanner.nextLine(); 
 
-        String criterio = "";		//Mandaremos estas variables como
-        String valor = "";			//parametros
+	    String criterio = "";
+	    String valor = "";
 
-        switch (choice) {
-            case 1:
-                criterio = "titulo";
-                System.out.println("Ingrese el título del libro:");
-                valor = scanner.nextLine();
-                break;
-            case 2:
-                criterio = "autor";
-                System.out.println("Ingrese el autor del libro:");
-                valor = scanner.nextLine();
-                break;
-            case 3:
-                criterio = "isbn";
-                System.out.println("Ingrese el ISBN del libro:");
-                valor = scanner.nextLine();
-                break;
-            default:
-                System.out.println("Opción no válida, intente de nuevo.");
-                return;
+	    switch (choice) {
+	        case 1:
+	            criterio = "titulo";
+	            System.out.println("Ingrese el título del libro:");
+	            valor = scanner.nextLine();
+	            break;
+	        case 2:
+	            criterio = "autor";
+	            System.out.println("Ingrese el autor del libro:");
+	            valor = scanner.nextLine();
+	            break;
+	        case 3:
+	            criterio = "isbn";
+	            System.out.println("Ingrese el ISBN del libro:");
+	            valor = scanner.nextLine();
+	            break;
+	        default:
+	            System.out.println("Opción no válida, intente de nuevo.");
+	            return;
+	    }
+	    try {
+	    	libroDAO.buscarLibro(criterio, valor);
+	    }catch (NumberFormatException e) {
+            System.out.println("Valor invalido, intente otra vez.");
+        }catch(IllegalArgumentException e){
+        	
+        	System.out.println("Error: " + e.getMessage());
         }
-        libroDAO.buscarLibro(criterio, valor);
-    }
+	    
+	}
 	
 	private static void nuevoMiembro() {
         System.out.println("nombre: ");			//Los miembros tambien tienen ID
@@ -275,10 +291,10 @@ public class Main {
     }
 	
 	private static void buscarMiembro() {
-		String valor = "";
-		System.out.println("Ingrese el nombre del miembro:");
-        valor = scanner.nextLine();
-		MiembroDAO.buscarMiembro(valor);	//enviamos parametro para hacer busqueda
+	    String valor = "";
+	    System.out.println("Ingrese el nombre del miembro:");
+	    valor = scanner.nextLine();
+	    MiembroDAO.buscarMiembro(valor); // enviamos parametro para hacer busqueda
 	}
 	
 	public static void registrarPrestamo() {

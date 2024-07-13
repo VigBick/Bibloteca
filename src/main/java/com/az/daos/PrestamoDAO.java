@@ -61,10 +61,19 @@ public class PrestamoDAO {
 	public void registrarDevolucion(int prestamoID) throws SQLException {
         String sqlDevolucion = "UPDATE TBL_PRESTAMOS SET fechaFIN = ? WHERE id = ?";
         String sqlDecrementarLibrosPrestados = "UPDATE TBL_LIBROS SET Prestados = Prestados - 1 WHERE id = (SELECT libroID FROM TBL_PRESTAMOS WHERE id = ?)";
-
+        String sqlVerificarPrestamo = "SELECT COUNT(*) FROM TBL_PRESTAMOS WHERE id = ?";
+        
+        
         try (Connection connection = DatabaseConnection.getInstance().getConnection();
+        	 PreparedStatement statementVerificarPrestamo = connection.prepareStatement(sqlVerificarPrestamo);
              PreparedStatement statementDevolucion = connection.prepareStatement(sqlDevolucion);
              PreparedStatement statementDecrementarLibrosPrestados = connection.prepareStatement(sqlDecrementarLibrosPrestados)) {
+        	
+        	statementVerificarPrestamo.setInt(1, prestamoID);
+            ResultSet rsPrestamo = statementVerificarPrestamo.executeQuery();
+            if (rsPrestamo.next() && rsPrestamo.getInt(1) == 0) {
+                throw new SQLException("Prestamo no encontrado: " + prestamoID);
+            }
 
             connection.setAutoCommit(false);
             Date fechaActual = new Date(System.currentTimeMillis());

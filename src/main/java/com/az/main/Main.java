@@ -299,24 +299,26 @@ public class Main {
 	
 	public static void registrarPrestamo() {
         System.out.print("Ingrese el ID del libro: ");
-        int libroID = scanner.nextInt();
+        String libroID = scanner.nextLine();
         System.out.print("Ingrese el ID del miembro: ");
-        int miembroID = scanner.nextInt();		//Se registra mediante el Id de
+        String miembroID = scanner.nextLine();		//Se registra mediante el Id de
         										//el libro y el miembro
         try {
-            prestamoDAO.registrarPrestamo(libroID, miembroID);
+            prestamoDAO.registrarPrestamo(Integer.parseInt(libroID), Integer.parseInt(miembroID));
             System.out.println("Préstamo registrado exitosamente.");
         } catch (SQLException e) {
             System.out.println("Error al registrar el préstamo: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            System.out.println("valor invalido introducido: " + e.getMessage());
         }
     }
 	
 	public static void registrarDevolucion() {
         System.out.print("Ingrese el ID del préstamo: ");
-        int prestamoID = scanner.nextInt();
+        String prestamoID = scanner.nextLine();
 
         try {
-            prestamoDAO.registrarDevolucion(prestamoID);
+            prestamoDAO.registrarDevolucion(Integer.parseInt(prestamoID));
             System.out.println("Devolución registrada exitosamente.");
         } catch (SQLException e) {
             System.out.println("Error al registrar la devolución: " + e.getMessage());

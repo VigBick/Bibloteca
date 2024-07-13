@@ -184,7 +184,7 @@ public class Main {
 	    System.out.println("Nuevo autor: ");
 	    String autor = scanner.nextLine();
 	    System.out.println("Nuevo ISBN: ");
-	    int isbn = scanner.nextInt();
+	    String isbn = scanner.nextLine();
 	    scanner.nextLine();
 	    
 	    int existencia;
@@ -201,7 +201,7 @@ public class Main {
 	    } while (existencia <= 0);
 	    
 	    try {
-	    	libroDAO.actualizarLibro(Integer.parseInt(id), titulo, autor, isbn, existencia);
+	    	libroDAO.actualizarLibro(Integer.parseInt(id), titulo, autor, Integer.parseInt(isbn), existencia);
 	    }catch (NumberFormatException e) {
             System.out.println("Valor invalido, intente otra vez.");
         }catch(IllegalArgumentException e){

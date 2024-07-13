@@ -6,8 +6,8 @@ id INT auto_increment PRIMARY KEY,
 titulo VARCHAR(50) NOT NULL,
 autor VARCHAR(50) NOT NULL,
 isbn int not null,
-existencia int,
-prestados int
+existencia int DEFAULT 1,
+prestados int DEFAULT  0
 );
 
 CREATE TABLE TBL_MIEMBROS(

@@ -53,15 +53,14 @@ public class PrestamoDAO {
 	        while(rsExistencia.next())
 	        {
 		        existencia = rsExistencia.getInt(1);
-		        System.out.println(existencia);
 	        }
 	        
 	        statementPrestados.setInt(1, libroID);
-	        ResultSet rsPrestados = statementExistencia.executeQuery();
+	        ResultSet rsPrestados = statementPrestados.executeQuery();
 	        while(rsPrestados.next())
 	        {
 		        prestados = rsPrestados.getInt(1);
-		        System.out.println(existencia);
+		        System.out.println(prestados);
 	        }
 	        
 	        if(existencia <= prestados)

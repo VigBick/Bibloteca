@@ -5,7 +5,7 @@ CREATE TABLE TBL_LIBROS(
 id INT auto_increment PRIMARY KEY,
 titulo VARCHAR(50) NOT NULL,
 autor VARCHAR(50) NOT NULL,
-isbn int not null,
+isbn bigint not null,
 existencia int DEFAULT 1,
 prestados int DEFAULT  0
 );

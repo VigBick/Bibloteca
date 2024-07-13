@@ -3,9 +3,9 @@ package com.az.clases;
 public class Libro {
 	private String titulo;
 	private String autor;
-	private int isbn;
+	private long isbn;
 	
-	public Libro(String titulo, String autor, int isbn) {
+	public Libro(String titulo, String autor, long isbn) {
 		setTitulo(titulo);
         setAutor(autor);
         setIsbn(isbn);
@@ -48,15 +48,15 @@ public class Libro {
         this.autor = autor;
     }
 
-	public int getIsbn() {
+	public long getIsbn() {
 		return isbn;
 	}
 
-	public void setIsbn(int isbn) {				//Validando que isbn sea positivo
-        if (isbn <= 0 || isbn >= 2147483647) {	
+	public void setIsbn(long isbn) {				//Validando que isbn sea positivo
+        if (isbn <= 0) {	
             throw new IllegalArgumentException("El ISBN debe ser un número positivo.");
         }
-        if(isbn > 2147483647)					//validando que isbn este en el limite de INT
+        if(isbn > 922337203685477580l)					//validando que isbn este en el limite positivo de LONG
         {
         	throw new IllegalArgumentException("El ISBN es demaciado grande.");
         }

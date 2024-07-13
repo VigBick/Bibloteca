@@ -17,11 +17,15 @@ public class PrestamoDAO {
 	    String sqlIncrementarLibrosPrestados = "UPDATE TBL_LIBROS SET prestados = prestados + 1 WHERE id = ?";
 	    String sqlVerificarLibro = "SELECT COUNT(*) FROM TBL_LIBROS WHERE id = ?";
 	    String sqlVerificarMiembro = "SELECT COUNT(*) FROM TBL_MIEMBROS WHERE id = ?";
+	    String sqlExistencia = "SELECT existencia from TBL_LIBROS where id = ?";
+	    String sqlPrestados = "SELECT prestados from TBL_LIBROS where id = ?";
 
 	    try (Connection connection = DatabaseConnection.getInstance().getConnection();
 	         PreparedStatement statementVerificarLibro = connection.prepareStatement(sqlVerificarLibro);
 	         PreparedStatement statementVerificarMiembro = connection.prepareStatement(sqlVerificarMiembro);
 	         PreparedStatement statementPrestamo = connection.prepareStatement(sqlPrestamo);
+	    	 PreparedStatement statementExistencia = connection.prepareStatement(sqlExistencia);
+	    	 PreparedStatement statementPrestados = connection.prepareStatement(sqlPrestados);
 	         PreparedStatement statementIncrementarLibrosPrestados = connection.prepareStatement(sqlIncrementarLibrosPrestados)) {
 
 	        connection.setAutoCommit(false);
@@ -39,7 +43,32 @@ public class PrestamoDAO {
 	        if (rsMiembro.next() && rsMiembro.getInt(1) == 0) {
 	            throw new SQLException("Miembro ID no encontrado: " + miembroID);
 	        }
-
+	        
+	        // Verificar disponibilidad
+	        int existencia = 0;
+	        int prestados = 0;
+	        
+	        statementExistencia.setInt(1, libroID);
+	        ResultSet rsExistencia = statementExistencia.executeQuery();
+	        while(rsExistencia.next())
+	        {
+		        existencia = rsExistencia.getInt(1);
+		        System.out.println(existencia);
+	        }
+	        
+	        statementPrestados.setInt(1, libroID);
+	        ResultSet rsPrestados = statementExistencia.executeQuery();
+	        while(rsPrestados.next())
+	        {
+		        prestados = rsPrestados.getInt(1);
+		        System.out.println(existencia);
+	        }
+	        
+	        if(existencia <= prestados)
+	        {
+	        	throw new SQLException("Libro no disponible");
+	        }
+	        
 	        // Registrar el préstamo
 	        Date fechaActual = new Date(System.currentTimeMillis());
 	        statementPrestamo.setDate(1, fechaActual);
@@ -53,8 +82,8 @@ public class PrestamoDAO {
 
 	        connection.commit();
 	    } catch (SQLException e) {
-	        e.printStackTrace();
-	        throw e;
+	        
+	        throw new SQLException("No se pudo crear prestamo");
 	    }
 	}
 
@@ -87,8 +116,8 @@ public class PrestamoDAO {
 
             connection.commit();
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            
+            throw new SQLException("Error al registrar devolucion");
         }
     }
 
@@ -117,8 +146,8 @@ public class PrestamoDAO {
 	            } while (resultSet.next());
 	        }
 	    } catch (SQLException e) {
-	        e.printStackTrace();
-	        throw e;
+	        
+	        throw new SQLException("No fue posible revisar el historial");
 	    }
 
 	    return historial;
@@ -151,8 +180,8 @@ public class PrestamoDAO {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            
+            throw new SQLException("Error al ver historial");
         }
 
         return historial;

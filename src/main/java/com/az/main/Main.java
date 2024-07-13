@@ -164,7 +164,7 @@ public class Main {
         String isbn = scanner.nextLine();
         scanner.nextLine();	//consumir salto de linea
         try {	//validamos la entrada
-        	Libro libro = new Libro(titulo, autor, Integer.parseInt(isbn));	//guardamos un nuevo libro con la info
+        	Libro libro = new Libro(titulo, autor, Long.parseLong(isbn));	//guardamos un nuevo libro con la info
         	libroDAO.insertLibro(libro);	// insertamos el libro
         	System.out.println("Libro creado correctamente: " + libro.getTitulo());
         }catch (NumberFormatException e) {
@@ -201,12 +201,12 @@ public class Main {
 	    } while (existencia <= 0);
 	    
 	    try {
-	    	libroDAO.actualizarLibro(Integer.parseInt(id), titulo, autor, Integer.parseInt(isbn), existencia);
+	    	libroDAO.actualizarLibro(Integer.parseInt(id), titulo, autor, Long.parseLong(isbn), existencia);
 	    }catch (NumberFormatException e) {
             System.out.println("Valor invalido, intente otra vez.");
         }catch(IllegalArgumentException e){
         	
-        	System.out.println("Error: " + e.getMessage());
+        	System.out.println("valor no valido");
         }
 	    
 	}

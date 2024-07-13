@@ -40,7 +40,7 @@ class LibroDAOTest {
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, libro.getTitulo());
             statement.setString(2, libro.getAutor());
-            statement.setInt(3, libro.getIsbn());
+            statement.setLong(3, libro.getIsbn());
             ResultSet resultSet = statement.executeQuery();
             assertTrue(resultSet.next()); // El libro debe existir
             assertEquals("Test Title", resultSet.getString("titulo"));

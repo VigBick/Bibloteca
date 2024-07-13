@@ -54,7 +54,7 @@ public class LibroDAO {
         }
     }
 
-	public void actualizarLibro(int id, String titulo, String autor, int isbn, int existencia) {
+	public void actualizarLibro(int id, String titulo, String autor, long isbn, int existencia) {
         String sql = "UPDATE TBL_LIBROS SET titulo = ?, autor = ?, isbn = ?, existencia = ? WHERE id = ?;";
         
         try(Connection connection = DatabaseConnection.getInstance().getConnection();
@@ -62,7 +62,7 @@ public class LibroDAO {
             
             statement.setString(1, titulo);
             statement.setString(2, autor);
-            statement.setInt(3, isbn);
+            statement.setLong(3, isbn);
             statement.setInt(4, existencia);
             statement.setInt(5, id);
             
@@ -96,7 +96,7 @@ public class LibroDAO {
 	            System.out.println("ID: " + resultSet.getInt("id"));
 	            System.out.println("Título: " + resultSet.getString("titulo"));
 	            System.out.println("Autor: " + resultSet.getString("autor"));
-	            System.out.println("ISBN: " + resultSet.getInt("isbn"));
+	            System.out.println("ISBN: " + resultSet.getLong("isbn"));
 	            System.out.println("---------------------");
 	        }
 	        if (!contenido) {
